@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package botanica;
+
+
+import "google/protobuf/empty.proto";
+ 
+service PlantService{
+
+  rpc ListPlants(google.protobuf.Empty) returns (ListReply);
+  rpc GetPlant(GetPlantRequest) returns (PlantReply);
+  rpc CreatePlant(CreatePlantRequest) returns (PlantReply);
+  rpc UpdatePlant(UpdatePlantRequest) returns (PlantReply);
+  rpc DeletePlant(DeletePlantRequest) returns (PlantReply);
+}
+ 
+message CreatePlantRequest{
+  string name=1;
+  int32 age = 2;
+}
+ 
+message GetPlantRequest{
+  int32 id =1;
+}
+ 
+message UpdatePlantRequest{
+  int32 id=1;
+  string name=2;
+  int32 age = 3;
+}
+ 
+message DeletePlantRequest{
+  int32 id =1;
+}
+ 
+message ListReply{
+  repeated PlantReply Plants = 1;
+}
+ 
+message PlantReply{
+  int32 id = 1;
+  string name=2;
+  int32 age = 3;
+}
