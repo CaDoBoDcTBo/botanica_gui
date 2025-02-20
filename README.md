@@ -1,6 +1,6 @@
-<<<<<<< HEAD
+
 # BotanicaUI
-=======
+
 # botanica_gui
 
 A new Flutter project.
