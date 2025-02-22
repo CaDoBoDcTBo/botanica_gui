@@ -1,6 +1,3 @@
-    // String username = 'b0tanica@yandex.ru';
-    // String password = 'lijqlqekdglxxquw';
-
 import 'package:flutter/material.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
@@ -19,8 +16,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   late String _verificationCode;
 
   Future<void> _sendVerificationEmail(String email) async {
-    String username = 'b0tanica@yandex.ru';
-    String password = 'lijqlqekdglxxquw';
+    String username = '';
+    String password = '';
 
     final smtpServer = SmtpServer(
       'smtp.yandex.ru',
