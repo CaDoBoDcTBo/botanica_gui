@@ -5,7 +5,7 @@ import 'package:botanica_gui/services/plant_service.dart'; // Импортиру
 class PlantFormScreen extends StatefulWidget {
   final Plant? plant;
 
-  PlantFormScreen({this.plant});
+  const PlantFormScreen({super.key, this.plant});
 
   @override
   _PlantFormScreenState createState() => _PlantFormScreenState();

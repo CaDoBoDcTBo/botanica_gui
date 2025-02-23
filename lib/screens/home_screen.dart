@@ -5,6 +5,8 @@ import 'plant_profile_screen.dart';
 import 'package:botanica_gui/services/plant_service.dart';
 
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -151,9 +153,9 @@ class _HomeScreenState extends State<HomeScreen> {
             MaterialPageRoute(builder: (context) => PlantFormScreen()),
           ).then((_) => _fetchPlants());
         },
-        child: Icon(Icons.add,color: Colors.white),
         tooltip: 'Добавить растение',
         backgroundColor: Color.fromARGB(255, 132, 245, 135),
+        child: Icon(Icons.add,color: Colors.white),
       ),
     );
   }

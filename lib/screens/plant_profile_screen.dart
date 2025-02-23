@@ -4,7 +4,7 @@ import 'plant_model.dart';
 class PlantProfileScreen extends StatelessWidget {
   final Plant plant;
 
-  PlantProfileScreen({required this.plant});
+  const PlantProfileScreen({super.key, required this.plant});
 
   @override
   Widget build(BuildContext context) {
@@ -55,8 +55,8 @@ class PlantProfileScreen extends StatelessWidget {
               onPressed: () {
                 // Реализуйте функцию для добавления заметок
               },
-              child: Text('Добавить заметку'),
               style: ElevatedButton.styleFrom(backgroundColor: Color.fromARGB(255, 132, 245, 135)),
+              child: Text('Добавить заметку'),
             ),
           ],
         ),

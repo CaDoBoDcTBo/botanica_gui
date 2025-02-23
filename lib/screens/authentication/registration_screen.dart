@@ -1,13 +1,15 @@
-    // String username = 'b0tanica@yandex.ru';
-    // String password = 'lijqlqekdglxxquw';
-
 import 'package:flutter/material.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
 import 'dart:math';
+import 'dart:convert';
+import 'package:flutter/services.dart' show rootBundle;
 import 'verification_screen.dart';  // Импортируйте VerificationScreen
+import 'login_screen.dart';
 
 class RegistrationScreen extends StatefulWidget {
+  const RegistrationScreen({super.key});
+
   @override
   _RegistrationScreenState createState() => _RegistrationScreenState();
 }
@@ -19,8 +21,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   late String _verificationCode;
 
   Future<void> _sendVerificationEmail(String email) async {
-    String username = 'b0tanica@yandex.ru';
-    String password = 'lijqlqekdglxxquw';
+    final credentials = await _loadCredentials();
+    String username = credentials['username']!;
+    String password = credentials['password']!;
 
     final smtpServer = SmtpServer(
       'smtp.yandex.ru',
@@ -67,12 +70,25 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     return (random.nextInt(900000) + 100000).toString();
   }
 
+  Future<Map<String, String>> _loadCredentials() async {
+    final String response = await rootBundle.loadString('assets/credentials.json');
+    final data = await json.decode(response);
+    return {
+      "username": data['username'],
+      "password": data['password'],
+    };
+  }
+
+
   Future<void> _registerWithEmailAndPassword() async {
     await _sendVerificationEmail(_emailController.text);
 
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => VerificationScreen(email: _emailController.text, sentCode: _verificationCode)),
+      MaterialPageRoute(builder: (context) => VerificationScreen(
+        email: _emailController.text,
+        password: _passwordController.text,
+        sentCode: _verificationCode)),
     );
   }
 
@@ -129,7 +145,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     obscureText: !_isPasswordVisible,
                     decoration: InputDecoration(
                       labelText: 'Password',
-                      hintText: '••••••••',
+                      //hintText: '••••••••',
                       border: OutlineInputBorder(),
                       suffixIcon: IconButton(
                         icon: Icon(
@@ -147,7 +163,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: _registerWithEmailAndPassword,
-                  child: Text('Verify your email', style: TextStyle(color: Colors.black)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,  // Установите нужный цвет кнопки
                     minimumSize: Size(300, 50),  // Установите нужные размеры
@@ -155,6 +170,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
+                  child: Text('Verify your email', style: TextStyle(color: Colors.black)),
                 ),
                 SizedBox(height: 20),
                 Row(
@@ -173,10 +189,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       width: 140,  // Ширина кнопки Sign In
                       child: TextButton(
                         onPressed: () {
-                          // Обработка входа
-                        },
-                        child: Text('Sign In', style: TextStyle(color: Colors.black)),
-                      ),
+                         Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => LoginScreen()),
+                        );
+                      },
+                      child: Text('Sign In', style: TextStyle(color: Colors.black)),
+                      )
                     ),
                   ],
                 ),
