@@ -78,11 +78,20 @@ class _PlantFormScreenState extends State<PlantFormScreen> {
                 decoration: InputDecoration(labelText: 'Age'),
                 keyboardType: TextInputType.number,
                 onSaved: (value) {
-                  _age = int.parse(value!);
+                  try {
+                    _age = int.parse(value!);
+                  } catch (e) {
+                    print('Error parsing age: ${e.toString()}');
+                  }
                 },
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter an age';
+                  }
+                  try {
+                    int.parse(value);
+                  } catch (e) {
+                    return 'Please enter a valid number';
                   }
                   return null;
                 },

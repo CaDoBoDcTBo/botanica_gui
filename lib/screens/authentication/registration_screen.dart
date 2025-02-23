@@ -43,7 +43,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       ..recipients.add(email)
       ..subject = 'Email Verification Code'
       ..text = 'Your verification code is: $_verificationCode';
-
+    print(_verificationCode);
     try {
       final sendReport = await send(message, smtpServer);
       print('Message sent: ' + sendReport.toString());

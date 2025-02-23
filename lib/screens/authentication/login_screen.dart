@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:grpc/grpc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:botanica_gui/generated/plant.pbgrpc.dart';  // Обновите путь к сгенерированным gRPC-классам
+import '../home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -13,8 +17,45 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isPasswordVisible = false;
 
   Future<void> _loginWithEmailAndPassword() async {
-    // Здесь можно добавить логику для входа
-    print('Email: ${_emailController.text}, Password: ${_passwordController.text}');
+    final channel = ClientChannel(
+      'localhost',
+      port: 5073,
+      options: const ChannelOptions(credentials: ChannelCredentials.insecure()),
+    );
+
+    final authClient = AuthenticationClient(channel);
+
+    try {
+      print('Attempting to login with email: ${_emailController.text} and password: ${_passwordController.text}');
+      final loginResponse = await authClient.login(LoginRequest()
+        ..username = _emailController.text
+        ..password = _passwordController.text);
+
+      if (loginResponse.token.isNotEmpty) {
+        print('Login successful! Received token: ${loginResponse.token}');
+        
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('token', loginResponse.token);
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomeScreen()),
+        );
+      } else {
+        print('Failed to login. Token was empty.');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to login. Please try again.')),
+        );
+      }
+    } catch (e) {
+      print('Error occurred during login: ${e.toString()}');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${e.toString()}')),
+      );
+    } finally {
+      print('Shutting down gRPC channel.');
+      await channel.shutdown();
+    }
   }
 
   @override

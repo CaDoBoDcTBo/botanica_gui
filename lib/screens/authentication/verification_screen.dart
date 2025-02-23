@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
-import 'registration_screen.dart';  // Импортируйте RegistrationScreen
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:grpc/grpc.dart';
+import 'package:botanica_gui/generated/plant.pbgrpc.dart';  // Обновите путь к сгенерированным gRPC-классам
 import '../home_screen.dart';
+import 'registration_screen.dart';  // Импортируйте RegistrationScreen
+
 
 class VerificationScreen extends StatefulWidget {
   final String email;
@@ -25,10 +28,57 @@ class _VerificationScreenState extends State<VerificationScreen> {
       // Сохраните статус верификации в локальном хранилище
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setBool('isVerified', true);
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => HomeScreen()),
+
+      // Создаем канал для gRPC
+      final channel = ClientChannel(
+        'localhost',
+        port: 5073,
+        options: const ChannelOptions(credentials: ChannelCredentials.insecure()),
       );
+
+      // Создаем клиента для Authentication
+      final authClient = AuthenticationClient(channel);
+
+      try {
+        // Сначала выполняем регистрацию
+        final registerResponse = await authClient.register(RegisterRequest()
+          ..username = widget.email
+          ..password = widget.password);
+
+        if (registerResponse.success) {
+          // Если регистрация успешна, выполняем вход для получения JWT токена
+          final loginResponse = await authClient.login(LoginRequest()
+            ..username = widget.email
+            ..password = widget.password);
+
+          if (loginResponse.token.isNotEmpty) {
+            print('Token: ${loginResponse.token}');
+
+            // Сохраните токен в локальном хранилище
+            await prefs.setString('token', loginResponse.token);
+
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => HomeScreen()),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Failed to obtain token. Please try again.')),
+            );
+          }
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Registration failed. Please try again.')),
+          );
+        }
+
+        // Закрытие канала
+        await channel.shutdown();
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${e.toString()}')),
+        );
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Invalid verification code. Please try again.')),
