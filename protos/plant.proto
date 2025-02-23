@@ -5,6 +5,30 @@ package botanica;
 
 import "google/protobuf/empty.proto";
  
+service Authentication {
+
+  rpc Login(LoginRequest) returns (LoginReply);
+  rpc Register(RegisterRequest) returns (RegisterReply);
+}
+
+message LoginRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message LoginReply {
+  string token = 1;
+}
+
+message RegisterRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message RegisterReply {
+  bool success = 1;
+}
+
 service PlantService{
 
   rpc ListPlants(google.protobuf.Empty) returns (ListReply);
@@ -14,9 +38,17 @@ service PlantService{
   rpc DeletePlant(DeletePlantRequest) returns (PlantReply);
 }
  
-message CreatePlantRequest{
-  string name=1;
-  int32 age = 2;
+message PlantReply {
+    int32 id = 1;
+    string name = 2;
+    int32 age = 3;
+    bytes photo = 4; 
+}
+
+message CreatePlantRequest {
+    string name = 1;
+    int32 age = 2;
+    bytes photo = 3; 
 }
  
 message GetPlantRequest{
@@ -35,10 +67,4 @@ message DeletePlantRequest{
  
 message ListReply{
   repeated PlantReply Plants = 1;
-}
- 
-message PlantReply{
-  int32 id = 1;
-  string name=2;
-  int32 age = 3;
 }
