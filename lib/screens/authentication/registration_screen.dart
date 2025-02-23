@@ -21,9 +21,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   late String _verificationCode;
 
   Future<void> _sendVerificationEmail(String email) async {
+
     final credentials = await _loadCredentials();
     String username = credentials['username']!;
     String password = credentials['password']!;
+
 
     final smtpServer = SmtpServer(
       'smtp.yandex.ru',
